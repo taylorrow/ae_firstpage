@@ -33,6 +33,7 @@ class MapSample extends StatefulWidget {
 class MapSampleState extends State<MapSample> {
   Completer<GoogleMapController> _controller = Completer();
   Location _location = Location();
+  LocationData _locationData;
   BitmapDescriptor _customIcon;
   Set<Marker> _markers = {};
 
@@ -154,7 +155,9 @@ class MapSampleState extends State<MapSample> {
                     height: 7,
                   ),
                   FloatingActionButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      _backToCurrentLocation();
+                    },
                     backgroundColor: Colors.white,
                     mini: true,
                     child: SvgPicture.asset(
@@ -176,11 +179,20 @@ class MapSampleState extends State<MapSample> {
   }
 
   Future<void> _goToCurrentLocation() async {
-    LocationData locationData = await _location.getLocation();
+    _locationData = await _location.getLocation();
     final GoogleMapController controller = await _controller.future;
     controller.animateCamera(CameraUpdate.newCameraPosition(
       CameraPosition(
-          target: LatLng(locationData.latitude, locationData.longitude),
+          target: LatLng(_locationData.latitude, _locationData.longitude),
+          zoom: 11),
+    ));
+  }
+
+  _backToCurrentLocation()async {
+    final GoogleMapController controller = await _controller.future;
+    controller.animateCamera(CameraUpdate.newCameraPosition(
+      CameraPosition(
+          target: LatLng(_locationData?.latitude, _locationData?.longitude),
           zoom: 11),
     ));
   }
